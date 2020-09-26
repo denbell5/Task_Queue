@@ -36,7 +36,6 @@ namespace TestConsoleApp
 				var claimTimer = timer as Timers.Timer;
 				claimTimer.Elapsed += (s, e) =>
 				{
-					logger.Log("claimTimer elapsed event");
 					CheckClaims();
 				};
 				claimTimer.Start();
@@ -49,6 +48,8 @@ namespace TestConsoleApp
 
 		static void CheckClaims()
 		{
+			logger.Log("Checking: Claims.");
+
 			if (context.TaskClaims.Count() == 0)
 			{
 				logger.Log($"Empty: Claims.");
@@ -60,7 +61,6 @@ namespace TestConsoleApp
 				.FirstOrDefault();
 
 			logger.Log($"Got: Claim {earliestClaim.Claim}");
-			context.TaskClaims.Remove(earliestClaim);
 
 			if (!Regex.IsMatch(earliestClaim.Claim, "Task_[0-9]{4}"))
 			{
@@ -75,13 +75,17 @@ namespace TestConsoleApp
 				Status = CustomTaskStatus.Queued
 			};
 
+			context.TaskClaims.Remove(earliestClaim);
 			context.CustomTasks.Add(newTask);
 			context.SaveChanges();
+			logger.Log($"Сreated: Task {newTask.Name}.");
 			CheckTasks();
 		}
 
 		private static void CheckTasks()
 		{
+			logger.Log("Checking: Claims.");
+
 			var inProgressTaskCount = context.CustomTasks.Count(
 				task => task.Status == CustomTaskStatus.InProgress
 			);
@@ -104,6 +108,7 @@ namespace TestConsoleApp
 			worker.ProgressChanged += OnProgressChanged;
 			worker.WorkCompleted += OnRunWorkerCompleted;
 			worker.StartWork();
+
 			logger.Log($"Started: Task {worker.Task.Name}");
 		}
 
