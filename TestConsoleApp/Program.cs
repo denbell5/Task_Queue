@@ -10,6 +10,7 @@ using Task_Queue.Data;
 using Task_Queue.Data.Models;
 using Task_Queue.Data.Models.Enums;
 using Task_Queue.InternalServices;
+using System.Text.RegularExpressions;
 
 namespace TestConsoleApp
 {
@@ -39,7 +40,7 @@ namespace TestConsoleApp
 		{
 			if (context.TaskClaims.Count() == 0)
 			{
-				logger.Log($"No claims in database.");
+				logger.Log($"Empty: Claims.");
 				return;
 			}
 
@@ -51,11 +52,15 @@ namespace TestConsoleApp
 				claim => claim.CreatedAt == earliestDate
 			);
 
-			logger.Log($"Got earliest Claim {earliestClaim.Claim}");
+			logger.Log($"Got: Claim {earliestClaim.Claim}");
 			context.TaskClaims.Remove(earliestClaim);
 			// TODO: check claim name syntax
 
-
+			if (!Regex.IsMatch(earliestClaim.Claim, "Task_[0-9]{4}"))
+			{
+				logger.Log($"Incorrect syntax: {earliestClaim.Claim}.");
+				return;
+			}
 
 			var newTask = new CustomTask
 			{
@@ -77,7 +82,7 @@ namespace TestConsoleApp
 
 			if (inProgressTaskCount > 0)
 			{
-				logger.Log("No available slots for new task to work.");
+				logger.Log("No available slots.");
 				return;
 			}
 
@@ -85,7 +90,7 @@ namespace TestConsoleApp
 
 			if (highestPriorityTask == null)
 			{
-				logger.Log("highestPriorityTask is null.");
+				logger.Log("Null: highestPriorityTask.");
 				return;
 			}
 
@@ -93,7 +98,7 @@ namespace TestConsoleApp
 			worker.ProgressChanged += OnProgressChanged;
 			worker.WorkCompleted += OnRunWorkerCompleted;
 			worker.StartWork();
-			logger.Log($"Task {worker.Task} started");
+			logger.Log($"Started: Task {worker.Task.Name}");
 		}
 
 		private static CustomTask GetHighestPriorityTask()
@@ -102,7 +107,7 @@ namespace TestConsoleApp
 				task => task.Status == CustomTaskStatus.Queued
 			);
 
-			if(queuedTasks.Count() == 0)
+			if (queuedTasks.Count() == 0)
 			{
 				return null;
 			}
@@ -125,7 +130,7 @@ namespace TestConsoleApp
 		{
 			if (e.Cancelled == true)
 			{
-				logger.Log("Canceled!");
+				logger.Log($"Canceled: {worker.Task.Name}");
 			}
 			else if (e.Error != null)
 			{
@@ -134,7 +139,7 @@ namespace TestConsoleApp
 			}
 			else
 			{
-				logger.Log($"Done {worker.Task.Name}");
+				logger.Log($"Done: {worker.Task.Name}");
 			}
 
 			worker.Task.Status = CustomTaskStatus.Completed;
