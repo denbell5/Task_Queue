@@ -22,6 +22,15 @@ namespace TestConsoleApp
 
 		static void Main(string[] args)
 		{
+			//var claims = context.TaskClaims.ToList();
+			//Console.WriteLine("da");
+
+			context.TaskClaims.Add(new TaskClaim
+			{
+				Claim = "Task_0000",
+				CreatedAt = DateTime.Now
+			});
+			context.SaveChanges();
 			Thread claimThread = new Thread((timer) =>
 			{
 				var claimTimer = timer as Timers.Timer;
@@ -31,8 +40,10 @@ namespace TestConsoleApp
 					CheckClaims();
 				};
 				claimTimer.Start();
+				CheckClaims();
 			});
 			claimThread.Start(claimTimer);
+
 			Console.ReadLine();
 		}
 
@@ -44,17 +55,12 @@ namespace TestConsoleApp
 				return;
 			}
 
-			var earliestDate = context.TaskClaims.Min(
-				claim => claim.CreatedAt
-			);
-
-			var earliestClaim = context.TaskClaims.FirstOrDefault(
-				claim => claim.CreatedAt == earliestDate
-			);
+			var earliestClaim = context.TaskClaims
+				.OrderBy(claim => claim.CreatedAt)
+				.FirstOrDefault();
 
 			logger.Log($"Got: Claim {earliestClaim.Claim}");
 			context.TaskClaims.Remove(earliestClaim);
-			// TODO: check claim name syntax
 
 			if (!Regex.IsMatch(earliestClaim.Claim, "Task_[0-9]{4}"))
 			{
@@ -64,13 +70,13 @@ namespace TestConsoleApp
 
 			var newTask = new CustomTask
 			{
-				Id = Guid.NewGuid(),
 				Name = earliestClaim.Claim,
 				Priority = Convert.ToInt32(earliestClaim.Claim.Replace("Task_", "")),
 				Status = CustomTaskStatus.Queued
 			};
 
 			context.CustomTasks.Add(newTask);
+			context.SaveChanges();
 			CheckTasks();
 		}
 
@@ -143,6 +149,8 @@ namespace TestConsoleApp
 			}
 
 			worker.Task.Status = CustomTaskStatus.Completed;
+			context.SaveChanges();
+
 			CheckTasks();
 		}
 	}
