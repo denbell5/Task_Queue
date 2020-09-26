@@ -11,24 +11,39 @@ namespace Task_Queue.InternalServices
 {
 	class WorkerWrapper
 	{
+		public delegate void ProgressReportedHandler(WorkerWrapper worker, ProgressChangedEventArgs args);
+		public event ProgressReportedHandler ProgressChanged;
+
+		public delegate void WorkCompletedHandler(WorkerWrapper worker, RunWorkerCompletedEventArgs args);
+		public event WorkCompletedHandler WorkCompleted;
+
 		public BackgroundWorker Worker { get; set; }
 		public CustomTask Task { get; set; }
 		public Logger Logger { get; set; }
 
-		private void StartBackgroundWork(object obj)
+		public WorkerWrapper(CustomTask task)
+		{
+			Task = task; 
+			
+			RegisterWorkerEvents();
+		}
+
+		private void RegisterWorkerEvents()
 		{
 			Worker = new BackgroundWorker();
+
 			Worker.WorkerReportsProgress = true;
 			Worker.WorkerSupportsCancellation = true;
-			Worker.DoWork += DoWork;
-			Worker.ProgressChanged += OnProgressChanged;
-			Worker.RunWorkerCompleted += OnRunWorkerCompleted;
-			Worker.RunWorkerAsync(obj);
+			
+			Worker.ProgressChanged += (s, e) => ProgressChanged(this, e);
+			Worker.RunWorkerCompleted += (s, e) => WorkCompleted(this, e);
+			Worker.DoWork += this.DoWork;
 		}
+
+		public void StartWork() => Worker.RunWorkerAsync();
 
 		private void DoWork(object sender, DoWorkEventArgs e)
 		{
-			Logger.Log($"Task {Task.Name} started");
 			Task.Status = CustomTaskStatus.InProgress;
 
 			for (int i = 1; i <= 10; i++)
