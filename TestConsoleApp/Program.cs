@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
-using System.Timers;
+using Timers = System.Timers;
 using Task_Queue.Data;
 using Task_Queue.Data.Models;
 using Task_Queue.Data.Models.Enums;
@@ -16,17 +17,21 @@ namespace TestConsoleApp
 	{
 		private static readonly TaskDbContext context = new TaskDbContext();
 		private static readonly ILogger logger = new ConsoleLogger();
-		private static Timer claimTimer = new Timer(5000);
+		private static Timers.Timer claimTimer = new Timers.Timer(5000);
 
 		static void Main(string[] args)
 		{
-			claimTimer.Elapsed += (s, e) =>
+			Thread claimThread = new Thread((timer) =>
 			{
-				logger.Log("claimTimer elapsed event");
-				CheckClaims();
-			};
-			claimTimer.Start();
-
+				var claimTimer = timer as Timers.Timer;
+				claimTimer.Elapsed += (s, e) =>
+				{
+					logger.Log("claimTimer elapsed event");
+					CheckClaims();
+				};
+				claimTimer.Start();
+			});
+			claimThread.Start(claimTimer);
 			Console.ReadLine();
 		}
 
@@ -49,6 +54,8 @@ namespace TestConsoleApp
 			logger.Log($"Got earliest Claim {earliestClaim.Claim}");
 			context.TaskClaims.Remove(earliestClaim);
 			// TODO: check claim name syntax
+
+
 
 			var newTask = new CustomTask
 			{
