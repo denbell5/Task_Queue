@@ -8,8 +8,8 @@ namespace Task_Queue.Data.Models
 {
 	public class TaskClaim
 	{
-		public Guid Id { get; set; }
+		public int Id { get; set; }
 		public string Claim { get; set; }
-		public DateTimeOffset CreatedAt { get; set; }
+		public DateTime CreatedAt { get; set; }
 	}
 }
