@@ -9,7 +9,7 @@ namespace Task_Queue.Data
 {
 	class TaskDbContext
 	{
-		public IEnumerable<TaskClaim> TaskClaims { get; set; } = new List<TaskClaim>
+		public List<TaskClaim> TaskClaims { get; set; } = new List<TaskClaim>
 		{
 			new TaskClaim
 			{
@@ -43,6 +43,6 @@ namespace Task_Queue.Data
 			},
 		};
 
-		public IEnumerable<CustomTask> CustomTasks { get; set; }
+		public List<CustomTask> CustomTasks { get; set; }
 	}
 }
