@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
 using System.Linq;
-using System.ServiceProcess;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
@@ -13,73 +10,34 @@ using Task_Queue.Data.Models;
 using Task_Queue.Data.Models.Enums;
 using Task_Queue.InternalServices;
 
-namespace Task_Queue
+namespace TestConsoleApp
 {
-	public partial class Service1 : ServiceBase
+	class Program
 	{
-		private readonly TaskDbContext context;
-		private readonly ILogger logger;
-		private Timer claimTimer;
-		private int counter = 0;
+		private static readonly TaskDbContext context = new TaskDbContext();
+		private static readonly ILogger logger = new ConsoleLogger();
+		private static Timer claimTimer = new Timer(5000);
 
-		public Service1()
+		static void Main(string[] args)
 		{
-			InitializeComponent();
-
-			logger = new Logger();
-			context = new TaskDbContext();
-		}
-
-		protected override void OnStart(string[] args)
-		{
-			logger.Log("Service started");
-			claimTimer = new Timer(5000);
 			claimTimer.Elapsed += (s, e) =>
 			{
 				logger.Log("claimTimer elapsed event");
 				CheckClaims();
 			};
 			claimTimer.Start();
+
+			Console.ReadLine();
 		}
 
-		protected override void OnStop()
+		static void CheckClaims()
 		{
-			claimTimer.Stop();
-			logger.Log("Service stopped");
-		}
-
-		private void OnProgressChanged(WorkerWrapper worker, ProgressChangedEventArgs e)
-		{
-			logger.Log($"{worker.Task.Name} {worker.Task.Progress}");
-		}
-
-		private void OnRunWorkerCompleted(WorkerWrapper worker, RunWorkerCompletedEventArgs e)
-		{
-			if (e.Cancelled == true)
+			if (context.TaskClaims.Count() == 0)
 			{
-				logger.Log("Canceled!");
-			}
-			else if (e.Error != null)
-			{
-				logger.Log("Error: " + e.Error.Message);
-				logger.Log("Error: " + e.Error.StackTrace);
-			}
-			else
-			{
-				logger.Log("Done!");
-				logger.Log(e.Result.GetHashCode().ToString());
+				logger.Log($"No claims in database.");
+				return;
 			}
 
-			var completedTask = e.Result as CustomTask;
-			completedTask.Status = CustomTaskStatus.Completed;
-			counter++;
-			// mark task completed
-			this.CheckTasks();
-		}
-
-
-		private void CheckClaims()
-		{
 			var earliestDate = context.TaskClaims.Min(
 				claim => claim.CreatedAt
 			);
@@ -87,12 +45,6 @@ namespace Task_Queue
 			var earliestClaim = context.TaskClaims.FirstOrDefault(
 				claim => claim.CreatedAt == earliestDate
 			);
-
-			if (earliestClaim == null)
-			{
-				logger.Log($"No claims in database.");
-				return;
-			}
 
 			logger.Log($"Got earliest Claim {earliestClaim.Claim}");
 			context.TaskClaims.Remove(earliestClaim);
@@ -107,19 +59,11 @@ namespace Task_Queue
 			};
 
 			context.CustomTasks.Add(newTask);
-
-			logger.Log("Before CheckTasks");
 			CheckTasks();
 		}
 
-		private void CheckTasks()
+		private static void CheckTasks()
 		{
-			logger.Log("In CheckTasks");
-			// look in db
-			// check tasks that are in progress
-			// if slots are available, get highest priority task
-			// start working on that task
-			//
 			var inProgressTaskCount = context.CustomTasks.Count(
 				task => task.Status == CustomTaskStatus.InProgress
 			);
@@ -132,13 +76,12 @@ namespace Task_Queue
 
 			var highestPriorityTask = GetHighestPriorityTask();
 
-			if(highestPriorityTask == null)
+			if (highestPriorityTask == null)
 			{
 				logger.Log("highestPriorityTask is null.");
 				return;
 			}
 
-			logger.Log($"Got {highestPriorityTask.Name} to work.");
 			WorkerWrapper worker = new WorkerWrapper(highestPriorityTask);
 			worker.ProgressChanged += OnProgressChanged;
 			worker.WorkCompleted += OnRunWorkerCompleted;
@@ -146,11 +89,16 @@ namespace Task_Queue
 			logger.Log($"Task {worker.Task} started");
 		}
 
-		private CustomTask GetHighestPriorityTask()
+		private static CustomTask GetHighestPriorityTask()
 		{
-			var queuedTasks = this.context.CustomTasks.Where(
+			var queuedTasks = context.CustomTasks.Where(
 				task => task.Status == CustomTaskStatus.Queued
 			);
+
+			if(queuedTasks.Count() == 0)
+			{
+				return null;
+			}
 
 			var highestPriority = queuedTasks.Min(task => task.Priority);
 
@@ -159,6 +107,31 @@ namespace Task_Queue
 			);
 
 			return highestPriorityTask;
+		}
+
+		private static void OnProgressChanged(WorkerWrapper worker, ProgressChangedEventArgs e)
+		{
+			logger.Log($"{worker.Task.Name} {worker.Task.Progress}");
+		}
+
+		private static void OnRunWorkerCompleted(WorkerWrapper worker, RunWorkerCompletedEventArgs e)
+		{
+			if (e.Cancelled == true)
+			{
+				logger.Log("Canceled!");
+			}
+			else if (e.Error != null)
+			{
+				logger.Log("Error: " + e.Error.Message);
+				logger.Log("Error: " + e.Error.StackTrace);
+			}
+			else
+			{
+				logger.Log($"Done {worker.Task.Name}");
+			}
+
+			worker.Task.Status = CustomTaskStatus.Completed;
+			CheckTasks();
 		}
 	}
 }

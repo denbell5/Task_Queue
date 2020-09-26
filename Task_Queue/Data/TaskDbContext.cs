@@ -7,7 +7,7 @@ using Task_Queue.Data.Models;
 
 namespace Task_Queue.Data
 {
-	class TaskDbContext
+	public class TaskDbContext
 	{
 		public List<TaskClaim> TaskClaims { get; set; } = new List<TaskClaim>
 		{
@@ -23,26 +23,26 @@ namespace Task_Queue.Data
 				Claim = $"Task_0002",
 				CreatedAt = DateTimeOffset.Now.AddMinutes(4)
 			},
-			new TaskClaim
-			{
-				Id = Guid.NewGuid(),
-				Claim = $"Task_0003",
-				CreatedAt = DateTimeOffset.Now.AddMinutes(3)
-			},
-			new TaskClaim
-			{
-				Id = Guid.NewGuid(),
-				Claim = $"Task_0004",
-				CreatedAt = DateTimeOffset.Now.AddMinutes(2)
-			},
-			new TaskClaim
-			{
-				Id = Guid.NewGuid(),
-				Claim = $"Task_0005",
-				CreatedAt = DateTimeOffset.Now.AddMinutes(1)
-			},
+			//new TaskClaim
+			//{
+			//	Id = Guid.NewGuid(),
+			//	Claim = $"Task_0003",
+			//	CreatedAt = DateTimeOffset.Now.AddMinutes(3)
+			//},
+			//new TaskClaim
+			//{
+			//	Id = Guid.NewGuid(),
+			//	Claim = $"Task_0004",
+			//	CreatedAt = DateTimeOffset.Now.AddMinutes(2)
+			//},
+			//new TaskClaim
+			//{
+			//	Id = Guid.NewGuid(),
+			//	Claim = $"Task_0005",
+			//	CreatedAt = DateTimeOffset.Now.AddMinutes(1)
+			//},
 		};
 
-		public List<CustomTask> CustomTasks { get; set; }
+		public List<CustomTask> CustomTasks { get; set; } = new List<CustomTask>();
 	}
 }

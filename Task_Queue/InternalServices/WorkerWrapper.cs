@@ -9,7 +9,7 @@ using Task_Queue.Data.Models.Enums;
 
 namespace Task_Queue.InternalServices
 {
-	class WorkerWrapper
+	public class WorkerWrapper
 	{
 		public delegate void ProgressReportedHandler(WorkerWrapper worker, ProgressChangedEventArgs args);
 		public event ProgressReportedHandler ProgressChanged;
@@ -19,7 +19,6 @@ namespace Task_Queue.InternalServices
 
 		public BackgroundWorker Worker { get; set; }
 		public CustomTask Task { get; set; }
-		public Logger Logger { get; set; }
 
 		public WorkerWrapper(CustomTask task)
 		{
@@ -56,9 +55,9 @@ namespace Task_Queue.InternalServices
 				else
 				{
 					// Perform a time consuming operation and report progress.
-					System.Threading.Thread.Sleep(500);
+					System.Threading.Thread.Sleep(2000);
 					Task.Progress = i * 10;
-					Worker.ReportProgress(Task.Progress, Task);
+					// Worker.ReportProgress(Task.Progress, Task);
 				}
 			}
 

@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{F6A655A7-D6F6-42FB-B0D0-8FBE5B8BC7BD}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
-    <RootNamespace>Task_Queue</RootNamespace>
-    <AssemblyName>Task_Queue</AssemblyName>
+    <ProjectGuid>{407C7B73-720E-49F3-8CBE-0ED385F0A91C}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>TestConsoleApp</RootNamespace>
+    <AssemblyName>TestConsoleApp</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -34,36 +34,15 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Management" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
-    <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Data\Models\CustomTask.cs" />
-    <Compile Include="Data\Models\Enums\CustomTaskStatus.cs" />
-    <Compile Include="Data\Models\TaskClaim.cs" />
-    <Compile Include="Data\TaskDbContext.cs" />
-    <Compile Include="InternalServices\Logger.cs" />
-    <Compile Include="InternalServices\WorkerWrapper.cs" />
-    <Compile Include="ProjectInstaller.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="ProjectInstaller.Designer.cs">
-      <DependentUpon>ProjectInstaller.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Service1.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Service1.Designer.cs">
-      <DependentUpon>Service1.cs</DependentUpon>
-    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -71,9 +50,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="ProjectInstaller.resx">
-      <DependentUpon>ProjectInstaller.cs</DependentUpon>
-    </EmbeddedResource>
+    <ProjectReference Include="..\Task_Queue\Task_Queue.csproj">
+      <Project>{f6a655a7-d6f6-42fb-b0d0-8fbe5b8bc7bd}</Project>
+      <Name>Task_Queue</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

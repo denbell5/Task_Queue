@@ -7,7 +7,20 @@ using System.Threading.Tasks;
 
 namespace Task_Queue.InternalServices
 {
-	class Logger
+	public interface ILogger
+	{
+		void Log(string message);
+	}
+
+	public class ConsoleLogger : ILogger
+	{
+		public void Log(string message)
+		{
+			Console.WriteLine(message);
+		}
+	}
+
+	public class Logger : ILogger
 	{
 		private object locker = new object();
 
