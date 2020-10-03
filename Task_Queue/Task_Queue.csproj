@@ -106,6 +106,7 @@
     <Compile Include="Data\TaskDbContext.cs" />
     <Compile Include="InternalServices\Logger.cs" />
     <Compile Include="InternalServices\RegistryService.cs" />
+    <Compile Include="InternalServices\TaskService.cs" />
     <Compile Include="InternalServices\WorkerWrapper.cs" />
     <Compile Include="ProjectInstaller.cs">
       <SubType>Component</SubType>
