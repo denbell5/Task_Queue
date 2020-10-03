@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Task_Queue", "Task_Queue\Ta
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestConsoleApp", "TestConsoleApp\TestConsoleApp.csproj", "{407C7B73-720E-49F3-8CBE-0ED385F0A91C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClaimMenu", "ClaimMenu\ClaimMenu.csproj", "{B5AE8BFD-1A91-452D-968A-EAA615A0E934}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{407C7B73-720E-49F3-8CBE-0ED385F0A91C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{407C7B73-720E-49F3-8CBE-0ED385F0A91C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{407C7B73-720E-49F3-8CBE-0ED385F0A91C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5AE8BFD-1A91-452D-968A-EAA615A0E934}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5AE8BFD-1A91-452D-968A-EAA615A0E934}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5AE8BFD-1A91-452D-968A-EAA615A0E934}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5AE8BFD-1A91-452D-968A-EAA615A0E934}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
