@@ -47,7 +47,7 @@ namespace Task_Queue.InternalServices
 		private void DoWork(object sender, DoWorkEventArgs e)
 		{
 			Task.Status = CustomTaskStatus.InProgress;
-			int updateCount = ProgressUpdatePeriod / ExecutionDuration;
+			int updateCount = ExecutionDuration / ProgressUpdatePeriod;
 			int percentagePerUpdate = (int)Math.Round(100.0 / updateCount);
 
 			for (int i = 1; i <= updateCount; i++)
