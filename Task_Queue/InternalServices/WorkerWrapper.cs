@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Task_Queue.Data;
 using Task_Queue.Data.Models;
 using Task_Queue.Data.Models.Enums;
 
@@ -17,16 +18,19 @@ namespace Task_Queue.InternalServices
 		public delegate void WorkCompletedHandler(WorkerWrapper worker, RunWorkerCompletedEventArgs args);
 		public event WorkCompletedHandler WorkCompleted;
 
+		private readonly TaskDbContext context;
+		private readonly int executionDuration;
+		private readonly int progressUpdatePeriod;
+
 		public BackgroundWorker Worker { get; set; }
 		public CustomTask Task { get; set; }
-		public int ExecutionDuration { get; set; }
-		public int ProgressUpdatePeriod { get; set; }
 
-		public WorkerWrapper(CustomTask task, int executionDuration, int progressUpdatePeriod = 2000)
+		public WorkerWrapper(CustomTask task, TaskDbContext context, int executionDuration, int progressUpdatePeriod = 2000)
 		{
 			Task = task;
-			ExecutionDuration = executionDuration;
-			ProgressUpdatePeriod = progressUpdatePeriod;
+			this.context = context;
+			this.executionDuration = executionDuration;
+			this.progressUpdatePeriod = progressUpdatePeriod;
 			RegisterWorkerEvents();
 		}
 
@@ -47,7 +51,9 @@ namespace Task_Queue.InternalServices
 		private void DoWork(object sender, DoWorkEventArgs e)
 		{
 			Task.Status = CustomTaskStatus.InProgress;
-			int updateCount = ExecutionDuration / ProgressUpdatePeriod;
+			context.SaveChanges();
+
+			int updateCount = executionDuration / progressUpdatePeriod;
 			int percentagePerUpdate = (int)Math.Round(100.0 / updateCount);
 
 			for (int i = 1; i <= updateCount; i++)
@@ -60,8 +66,10 @@ namespace Task_Queue.InternalServices
 				else
 				{
 					// Perform a time consuming operation and report progress.
-					System.Threading.Thread.Sleep(ProgressUpdatePeriod);
+					System.Threading.Thread.Sleep(progressUpdatePeriod);
 					Task.Progress += percentagePerUpdate;
+					context.SaveChanges();
+
 					Worker.ReportProgress(Task.Progress, Task);
 				}
 			}
