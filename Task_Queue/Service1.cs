@@ -35,14 +35,6 @@ namespace Task_Queue
 
 		protected override void OnStart(string[] args)
 		{
-
-			context.TaskClaims.Add(new TaskClaim
-			{
-				Claim = "Task_0000",
-				CreatedAt = DateTime.Now
-			});
-			context.SaveChanges();
-
 			Thread claimThread = new Thread((timer) =>
 			{
 				var claimTimer = timer as Timers.Timer;
@@ -62,6 +54,7 @@ namespace Task_Queue
 			claimTimer.Stop();
 			logger.Log("Service stopped");
 		}
+
 
 		private void CheckClaims()
 		{
@@ -96,6 +89,7 @@ namespace Task_Queue
 			context.CustomTasks.Add(newTask);
 			context.SaveChanges();
 			logger.Log($"Сreated: Task {newTask.Name}.");
+
 			CheckTasks();
 		}
 
