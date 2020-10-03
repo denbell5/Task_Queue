@@ -36,7 +36,7 @@ namespace Task_Queue.InternalServices
 				RegistryParameterKeys.TaskExecutionDurationKey
 			);
 
-			ExecutionQuantity = 1000 * (int)RegistryService.GetParameterValue(
+			ExecutionQuantity = (int)RegistryService.GetParameterValue(
 				RegistryParameterKeys.Path,
 				RegistryParameterKeys.TaskExecutionQuantityKey
 			);
@@ -134,13 +134,14 @@ namespace Task_Queue.InternalServices
 				return;
 			}
 
-			WorkerWrapper worker = new WorkerWrapper(highestPriorityTask, ExecutionDuration);
+			WorkerWrapper worker = new WorkerWrapper(highestPriorityTask, context, ExecutionDuration);
 			worker.ProgressChanged += OnProgressChanged;
 			worker.WorkCompleted += OnRunWorkerCompleted;
 			worker.StartWork();
 
 			logger.Log($"Started: Task {worker.Task.Name}");
 		}
+
 
 		private CustomTask GetHighestPriorityTask()
 		{
@@ -161,6 +162,7 @@ namespace Task_Queue.InternalServices
 
 			return highestPriorityTask;
 		}
+
 
 		private void OnProgressChanged(WorkerWrapper worker, ProgressChangedEventArgs e)
 		{
