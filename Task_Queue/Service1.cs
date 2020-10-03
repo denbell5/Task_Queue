@@ -14,6 +14,7 @@ using Task_Queue.Data;
 using Task_Queue.Data.Models;
 using Task_Queue.Data.Models.Enums;
 using Task_Queue.InternalServices;
+using Task_Queue.Data.Constants;
 
 namespace Task_Queue
 {
@@ -23,13 +24,32 @@ namespace Task_Queue
 		private readonly ILogger logger;
 		private Timers.Timer claimTimer;
 
+		public int ClaimCheckPeriod { get; set; }
+		public int ExecutionDuration { get; set; }
+		public int ExecutionQuantity { get; set; }
+
 		public Service1()
 		{
 			InitializeComponent();
 
+			ClaimCheckPeriod = (int)RegistryService.GetParameterValue(
+				RegistryParameterKeys.Path,
+				RegistryParameterKeys.TaskClaimCheckPeriodKey
+			);
+
+			ExecutionDuration = (int)RegistryService.GetParameterValue(
+				RegistryParameterKeys.Path,
+				RegistryParameterKeys.TaskExecutionDurationKey
+			);
+
+			ExecutionQuantity = (int)RegistryService.GetParameterValue(
+				RegistryParameterKeys.Path,
+				RegistryParameterKeys.TaskExecutionQuantityKey
+			);
+
 			logger = new Logger();
 			context = new TaskDbContext();
-			claimTimer = new Timers.Timer(5000);
+			claimTimer = new Timers.Timer(ClaimCheckPeriod);
 		}
 
 		protected override void OnStart(string[] args)
@@ -106,7 +126,7 @@ namespace Task_Queue
 				task => task.Status == CustomTaskStatus.InProgress
 			);
 
-			if (inProgressTaskCount > 0)
+			if (inProgressTaskCount >= ExecutionQuantity)
 			{
 				logger.Log("No available slots.");
 				return;
@@ -120,7 +140,7 @@ namespace Task_Queue
 				return;
 			}
 
-			WorkerWrapper worker = new WorkerWrapper(highestPriorityTask);
+			WorkerWrapper worker = new WorkerWrapper(highestPriorityTask, ExecutionDuration);
 			worker.ProgressChanged += OnProgressChanged;
 			worker.WorkCompleted += OnRunWorkerCompleted;
 			worker.StartWork();

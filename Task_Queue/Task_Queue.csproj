@@ -99,11 +99,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Data\Constants\RegistryParameterKeys.cs" />
     <Compile Include="Data\Models\CustomTask.cs" />
     <Compile Include="Data\Models\Enums\CustomTaskStatus.cs" />
     <Compile Include="Data\Models\TaskClaim.cs" />
     <Compile Include="Data\TaskDbContext.cs" />
     <Compile Include="InternalServices\Logger.cs" />
+    <Compile Include="InternalServices\RegistryService.cs" />
     <Compile Include="InternalServices\WorkerWrapper.cs" />
     <Compile Include="ProjectInstaller.cs">
       <SubType>Component</SubType>
