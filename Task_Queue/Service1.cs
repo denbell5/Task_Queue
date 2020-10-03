@@ -22,7 +22,6 @@ namespace Task_Queue
 		private readonly TaskDbContext context;
 		private readonly ILogger logger;
 		private Timers.Timer claimTimer;
-		private int counter = 0;
 
 		public Service1()
 		{
