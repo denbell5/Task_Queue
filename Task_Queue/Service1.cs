@@ -78,6 +78,12 @@ namespace Task_Queue
 				return;
 			}
 
+			if (context.CustomTasks.Any(task => task.Name == earliestClaim.Claim))
+			{
+				logger.Log($"Task already exists: {earliestClaim.Claim}.");
+				return;
+			}
+
 			var newTask = new CustomTask
 			{
 				Name = earliestClaim.Claim,
