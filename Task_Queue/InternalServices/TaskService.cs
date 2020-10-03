@@ -54,16 +54,16 @@ namespace Task_Queue.InternalServices
 				var claimTimer = timer as Timers.Timer;
 				claimTimer.Elapsed += (s, e) =>
 				{
-					CheckClaims();
+					AddTaskFromClaims();
 				};
 				claimTimer.Start();
-				CheckClaims();
+				AddTaskFromClaims();
 			});
 
 			claimThread.Start(claimTimer);
 		}
 
-		private void CheckClaims()
+		private void AddTaskFromClaims()
 		{
 			logger.Log("Checking: Claims.");
 
@@ -86,7 +86,7 @@ namespace Task_Queue.InternalServices
 			{
 				logger.Log($"Incorrect syntax: {earliestClaim.Claim}.");
 				context.SaveChanges();
-				CheckClaims();
+				AddTaskFromClaims();
 				return;
 			}
 
@@ -94,7 +94,7 @@ namespace Task_Queue.InternalServices
 			{
 				logger.Log($"Task already exists: {earliestClaim.Claim}.");
 				context.SaveChanges();
-				CheckClaims();
+				AddTaskFromClaims();
 				return;
 			}
 
@@ -109,10 +109,10 @@ namespace Task_Queue.InternalServices
 			context.SaveChanges();
 			logger.Log($"Сreated: Task {newTask.Name}.");
 
-			CheckTasks();
+			StartHighestPriorityTask();
 		}
 
-		private void CheckTasks()
+		private void StartHighestPriorityTask()
 		{
 			logger.Log("Checking: Claims.");
 
@@ -188,7 +188,7 @@ namespace Task_Queue.InternalServices
 			worker.Task.Status = CustomTaskStatus.Completed;
 			context.SaveChanges();
 
-			CheckTasks();
+			StartHighestPriorityTask();
 		}
 	}
 }
