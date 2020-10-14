@@ -63,6 +63,7 @@ namespace Task_Queue.InternalServices
 			claimThread.Start(claimTimer);
 		}
 
+
 		private void AddTaskFromClaims()
 		{
 			logger.Log("Checking: Claims.");
@@ -77,10 +78,8 @@ namespace Task_Queue.InternalServices
 				.OrderBy(claim => claim.CreatedAt)
 				.FirstOrDefault();
 
-			logger.Log($"Got: Claim {earliestClaim.Claim}");
-
 			context.TaskClaims.Remove(earliestClaim);
-			
+			logger.Log($"Got: Claim {earliestClaim.Claim}");	
 
 			if (!Regex.IsMatch(earliestClaim.Claim, "Task_[0-9]{4}"))
 			{
@@ -101,8 +100,8 @@ namespace Task_Queue.InternalServices
 			var newTask = new CustomTask
 			{
 				Name = earliestClaim.Claim,
+				Status = CustomTaskStatus.Queued,
 				Priority = Convert.ToInt32(earliestClaim.Claim.Replace("Task_", "")),
-				Status = CustomTaskStatus.Queued
 			};
 
 			context.CustomTasks.Add(newTask);
@@ -114,7 +113,7 @@ namespace Task_Queue.InternalServices
 
 		private void StartHighestPriorityTask()
 		{
-			logger.Log("Checking: Claims.");
+			logger.Log("Checking: Tasks.");
 
 			var inProgressTaskCount = context.CustomTasks.Count(
 				task => task.Status == CustomTaskStatus.InProgress
