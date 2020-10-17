@@ -12,7 +12,7 @@ namespace Task_Queue.Data
 	public class TaskDbContext : DbContext
 	{
 		public TaskDbContext()
-			: base("server=192.168.5.101; port=3306; database=Pinokkio; user=root; password=123456; CharSet=UTF8; Convert Zero Datetime=true;")
+			: base("server=192.168.5.104; port=3306; database=Pinokkio; user=root; password=123456; CharSet=UTF8; Convert Zero Datetime=true;")
 		{ }
 
 		public DbSet<TaskClaim> TaskClaims { get; set; }
