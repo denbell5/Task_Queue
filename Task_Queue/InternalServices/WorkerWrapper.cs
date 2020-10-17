@@ -54,7 +54,6 @@ namespace Task_Queue.InternalServices
 			context.SaveChanges();
 
 			int updateCount = executionDuration / progressUpdatePeriod;
-			int percentagePerUpdate = (int)Math.Round(100.0 / updateCount);
 
 			for (int i = 1; i <= updateCount; i++)
 			{
@@ -67,7 +66,7 @@ namespace Task_Queue.InternalServices
 				{
 					// Perform a time consuming operation and report progress.
 					System.Threading.Thread.Sleep(progressUpdatePeriod);
-					Task.Progress += percentagePerUpdate;
+					Task.Progress = (int)Math.Round(CalculateCurrentProgress(i));
 					context.SaveChanges();
 
 					Worker.ReportProgress(Task.Progress, Task);
@@ -75,6 +74,11 @@ namespace Task_Queue.InternalServices
 			}
 
 			e.Result = Task;
+		}
+
+		public double CalculateCurrentProgress(int cycleIndex)
+		{
+			return 100 * cycleIndex * progressUpdatePeriod / executionDuration;
 		}
 	}
 }
